@@ -11,7 +11,6 @@ class WeightedEdge:
     from_: str
     to: str 
 
-
 class WeightedGraph:
 
     def __init__(self):
@@ -57,19 +56,32 @@ class WeightedGraph:
             current = previous
         return path
 
-    # Perform dijkstra's algorithm from *start*, looking through
-    # the entire graph
-    # Returns a pair containing the *parents* (how to get to each vertex)
-    # and the *distances* (how far each vertex is from the start) tables
+    # dijkstra's
     def dijkstra(self, start):
+        # parents keeps track of how we reached each node
         parents = {start: start}
         distances = {start: 0}
-        
-        # YOUR CODE HERE
-        
+
+        pq = PriorityQueue()
+        pq.put((0, start))   #distance
+
+        # Loop until no more nodes are left to process
+        while not pq.empty():
+            current_dist, current = pq.get()
+
+            for edge in self.edges_from(current):
+                new_distance = current_dist + edge.weight
+
+                if edge.to not in distances or new_distance < distances[edge.to]:
+                    distances[edge.to] = new_distance
+                    parents[edge.to] = current
+                    pq.put((new_distance, edge.to))
+
         return parents, distances
     
     
     def __str__(self):
-        return '\n'.join(f"{vertex}: {[f'{edge.to}({edge.weight})' for edge in edges]}"
-                         for vertex, edges in self._adjacency_list.items())
+        return '\n'.join(
+            f"{vertex}: {[f'{edge.to}({edge.weight})' for edge in edges]}"
+            for vertex, edges in self._adjacency_list.items()
+        )
